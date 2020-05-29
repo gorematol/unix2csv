@@ -30,12 +30,9 @@ func main() {
     // Read file line by then
     lineoutput := bufio.NewScanner(file)
     for lineoutput.Scan() {
-        for _,c := range lineoutput.Text() {    
-
-	    if string(c) == d {
-		strings.Replace(lineoutput.Text(), d,  csvd, -1)
-	        fmt.Println(lineoutput.Text())
-	    }
+	if strings.Contains(lineoutput.Text(), d) {
+            newstr := strings.Replace(lineoutput.Text(), d,  csvd, -1)
+            fmt.Println(newstr)
         }
     }
 
