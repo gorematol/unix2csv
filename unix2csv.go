@@ -2,19 +2,43 @@ package main
 
 import (
     "fmt"
-    "io/ioutil"
+    "bufio"
+    "os"
+    "log"
+    "strings"
 )
 
 func main() {
+
+    // Specify Unix filename	
     fmt.Print("Please enter Unix filename:-")
     var filename string
     fmt.Scanln(&filename)
 
-    data, err := ioutil.ReadFile(filename)
+    // specify unix delimeter
+    fmt.Print("Please enter file delimeter:-")
+    var d string
+    fmt.Scanln(&d)
+    var csvd string = ","
+
+    // Open unix file
+    file, err := os.Open(filename)
     if err != nil {
-        fmt.Println(err)
+        log.Fatal(err)
     }
 
-    fmt.Print(string(data))
+    // Read file line by then
+    lineoutput := bufio.NewScanner(file)
+    for lineoutput.Scan() {
+        for _,c := range lineoutput.Text() {    
+
+	    if string(c) == d {
+		strings.Replace(lineoutput.Text(), d,  csvd, -1)
+	        fmt.Println(lineoutput.Text())
+	    }
+        }
+    }
+
+    file.Close()
 
 }
