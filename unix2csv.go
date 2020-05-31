@@ -42,7 +42,6 @@ func main() {
     json.Unmarshal(b, &files)
 
     for _,value := range files.Files {
-      // Read file line by then
       file, err := os.Open(value.Input)
       if err != nil {
 	fmt.Fprintf(os.Stdout, "Unix metdata json file not available or named incorrectly")
