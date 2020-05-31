@@ -1,0 +1,14 @@
+{
+  "files": [
+    {
+      "inputfile" : "/etc/passwd",
+      "delimeter" : ":",
+      "outputfile": "passwd.csv"
+    },
+    {
+      "inputfile" : "/etc/group",
+      "delimeter" : ":",
+      "outputfile": "group.csv"
+    }
+  ]
+}
