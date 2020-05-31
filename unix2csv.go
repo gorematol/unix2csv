@@ -2,40 +2,64 @@ package main
 
 import (
     "fmt"
-    "bufio"
     "os"
-    "log"
-    "strings"
+    "bufio"
+    "io/ioutil"
+    "encoding/json"
 )
 
 func main() {
 
-    // Specify Unix filename	
-    fmt.Print("Please enter Unix filename:-")
-    var filename string
-    fmt.Scanln(&filename)
+   // var csvd string = ","
 
-    // specify unix delimeter
-    fmt.Print("Please enter file delimeter:-")
-    var d string
-    fmt.Scanln(&d)
-    var csvd string = ","
+    type File struct {
+        Input string `json:"inputfile"`  
+	Delimeter string `json:"delimeter"` 
+	Output string `json:"outputfile"` 
+    }
 
-    // Open unix file
-    file, err := os.Open(filename)
+    type Unixfiles struct  {
+	Files []File 
+    }
+
+
+    // Open json file
+    jsonfile, err := os.Open("unixmeta.json")
     if err != nil {
-        log.Fatal(err)
+	fmt.Fprintf(os.Stdout, "Unix metdata json file not available or named incorrectly")
+        os.Exit(1) 
     }
 
-    // Read file line by then
-    lineoutput := bufio.NewScanner(file)
-    for lineoutput.Scan() {
-	if strings.Contains(lineoutput.Text(), d) {
-            newstr := strings.Replace(lineoutput.Text(), d,  csvd, -1)
-            fmt.Println(newstr)
-        }
+    // Read json file into a byte array
+    b, err := ioutil.ReadAll(jsonfile)
+    if err != nil {
+	fmt.Fprintf(os.Stdout, "Can not read json file into a byte array")
+        os.Exit(1) 
     }
 
-    file.Close()
+    
+    var files Unixfiles 
+    json.Unmarshal(b, &files)
+
+    for _,value := range files.Files {
+      // Read file line by then
+      file, err := os.Open(value.Input)
+      if err != nil {
+	fmt.Fprintf(os.Stdout, "Unix metdata json file not available or named incorrectly")
+        os.Exit(1) 
+      }
+
+      lineoutput := bufio.NewScanner(file)
+      for lineoutput.Scan() {
+//	if strings.Contains(lineoutput.Text(), d) {
+//            newstr := strings.Replace(lineoutput.Text(), d,  csvd, -1)
+//            fmt.Println(newstr)
+        fmt.Println(lineoutput.Text())
+//        }
+      }
+      file.Close()
+    }
+
+    jsonfile.Close()
 
 }
