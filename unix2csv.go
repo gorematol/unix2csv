@@ -2,15 +2,17 @@ package main
 
 import (
     "fmt"
+    "log"
     "os"
     "bufio"
     "io/ioutil"
     "encoding/json"
 )
 
+
 func main() {
 
-   // var csvd string = ","
+    // var csvd string = ","
 
     type File struct {
         Input string `json:"inputfile"`  
@@ -22,29 +24,27 @@ func main() {
 	Files []File 
     }
 
-
     // Open json file
-    jsonfile, err := os.Open("unixmeta.json")
+    jsonfile, err := openfile("unixmeta.json")
     if err != nil {
-	fmt.Fprintf(os.Stdout, "Unix metdata json file not available or named incorrectly")
+	log.Fatal(err)
         os.Exit(1) 
     }
 
     // Read json file into a byte array
     b, err := ioutil.ReadAll(jsonfile)
     if err != nil {
-	fmt.Fprintf(os.Stdout, "Can not read json file into a byte array")
+	log.Fatal(err)
         os.Exit(1) 
     }
 
-    
     var files Unixfiles 
     json.Unmarshal(b, &files)
 
     for _,value := range files.Files {
-      file, err := os.Open(value.Input)
+      file, err := openfile(value.Input)
       if err != nil {
-	fmt.Fprintf(os.Stdout, "Unix metdata json file not available or named incorrectly")
+	log.Fatal(err)
         os.Exit(1) 
       }
 
@@ -60,5 +60,12 @@ func main() {
     }
 
     jsonfile.Close()
+}
 
+func openfile(filename string) (*os.File, error) {
+        f, err := os.Open(filename)
+        if err != nil {
+		return nil, err 
+        }
+        return f, nil
 }
