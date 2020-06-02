@@ -25,7 +25,7 @@ func main() {
     }
 
     // Open json file
-    jsonfile, err := openfile("unixmeta.json")
+    jsonfile, err := openFile("unixmeta.json")
     if err != nil {
 	log.Fatal(err)
         os.Exit(1) 
@@ -38,11 +38,28 @@ func main() {
         os.Exit(1) 
     }
 
-    var files Unixfiles 
-    json.Unmarshal(b, &files)
+    var data Unixfiles 
+    err := json.Unmarshal(b, &data)
+    if (err != nil) {
+   		return
+	}
+    fmt.Printf("%T\n", data.Files)
+    processData(data)
+    jsonfile.Close()
+}
 
-    for _,value := range files.Files {
-      file, err := openfile(value.Input)
+func openFile(filename string) (*os.File, error) {
+        f, err := os.Open(filename)
+        if err != nil {
+		return nil, err 
+        }
+        return f, nil
+}
+
+func processData(metadata Unixfiles) {
+
+    for _,value := range metadata.Files {
+      file, err := openFile(value.Input)
       if err != nil {
 	log.Fatal(err)
         os.Exit(1) 
@@ -58,14 +75,5 @@ func main() {
       }
       file.Close()
     }
+}    
 
-    jsonfile.Close()
-}
-
-func openfile(filename string) (*os.File, error) {
-        f, err := os.Open(filename)
-        if err != nil {
-		return nil, err 
-        }
-        return f, nil
-}
