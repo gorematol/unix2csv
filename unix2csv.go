@@ -4,20 +4,20 @@ import (
     "fmt"
     "log"
     "os"
-    "bufio"
+//    "bufio"
     "io/ioutil"
     "encoding/json"
+//    "reflect"
 )
 
 
 func main() {
 
     // var csvd string = ","
-
     type File struct {
-        Input string `json:"inputfile"`  
-	Delimeter string `json:"delimeter"` 
-	Output string `json:"outputfile"` 
+        Input string 
+	Delimeter string
+	Output string  
     }
 
     type Unixfiles struct  {
@@ -38,13 +38,9 @@ func main() {
         os.Exit(1) 
     }
 
-    var data Unixfiles 
-    err := json.Unmarshal(b, &data)
-    if (err != nil) {
-   		return
-	}
-    fmt.Printf("%T\n", data.Files)
-    processData(data)
+ //   metadata := Unixfiles{}
+ //   json.Unmarshal(b, &metadata)
+    processData(Unixfiles{}, b)
     jsonfile.Close()
 }
 
@@ -56,9 +52,19 @@ func openFile(filename string) (*os.File, error) {
         return f, nil
 }
 
-func processData(metadata Unixfiles) {
+func processData(metadata interface{}, b []byte) {
 
-    for _,value := range metadata.Files {
+      json.Unmarshal(b, &metadata)
+      m := metadata.(map[string]interface{}) 
+      fmt.Println(m) 
+
+      for _,value := range m {
+	      for _,file := range value.([]interface{}) {
+		      input, err := file["Input"]
+		      fmt.Println(input)
+	      }
+      }
+      /* 
       file, err := openFile(value.Input)
       if err != nil {
 	log.Fatal(err)
@@ -75,5 +81,7 @@ func processData(metadata Unixfiles) {
       }
       file.Close()
     }
+      */
+
 }    
 
