@@ -3,44 +3,32 @@ package main
 import (
 	"bufio"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 	"strings"
 )
 
-func main() {
-	type File struct {
-		Input     string
-		Delimeter string
-		Output    string
-	}
+type File struct {
+	Input     string
+	Delimeter string
+	Output    string
+}
 
-	type Unixfiles struct {
-		Files []File
-	}
-
-	// Open json file
-	jsonfile, err := openFile("unixmeta.json")
-	if err != nil {
-		log.Fatal(err)
-		os.Exit(1)
-	}
-
-	// Read json file into a byte array
-	b, err := ioutil.ReadAll(jsonfile)
-	if err != nil {
-		log.Fatal(err)
-		os.Exit(1)
-	}
-
-	processData(Unixfiles{}, b)
-	jsonfile.Close()
+type Unixfiles struct {
+	Files []File
 }
 
 func openFile(filename string) (*os.File, error) {
 	f, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	return f, nil
+}
+
+func createCsv(file string) (*os.File, error) {
+	f, err := os.Create(file)
 	if err != nil {
 		return nil, err
 	}
@@ -62,13 +50,39 @@ func processData(metadata interface{}, b []byte) {
 			}
 			d := record["Delimeter"].(string)
 			lineoutput := bufio.NewScanner(inputfile)
+			outputfile, err := createCsv(record["Output"].(string))
 			for lineoutput.Scan() {
 				if strings.Contains(lineoutput.Text(), d) {
 					newstr := strings.Replace(lineoutput.Text(), d, csvd, -1)
-					fmt.Println(newstr)
+					_, err := outputfile.WriteString(newstr + "\n")
+					if err != nil {
+						log.Fatal(err)
+						os.Exit(1)
+					}
 				}
 			}
 			inputfile.Close()
+			outputfile.Close()
 		}
 	}
+}
+
+func main() {
+
+	// Open json file
+	jsonfile, err := openFile("unixmeta.json")
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
+
+	// Read json file into a byte array
+	b, err := ioutil.ReadAll(jsonfile)
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
+
+	processData(Unixfiles{}, b)
+	jsonfile.Close()
 }
