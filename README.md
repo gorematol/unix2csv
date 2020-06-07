@@ -6,5 +6,5 @@ Ouput csv will be in current working directory
 
 ### Pending Features 
 Socket or rest connection to send csv to remote location
-Potential for auth fucntion to allow this in a secure manner
+Potential for auth function to allow this in a secure manner
 
