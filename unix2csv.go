@@ -48,6 +48,8 @@ func processData(metadata interface{}, b []byte) {
 				log.Fatal(err)
 				os.Exit(1)
 			}
+			defer inputfile.Close()
+
 			d := record["Delimeter"].(string)
 			lineoutput := bufio.NewScanner(inputfile)
 			outputfile, err := createCsv(record["Output"].(string))
@@ -59,10 +61,9 @@ func processData(metadata interface{}, b []byte) {
 						log.Fatal(err)
 						os.Exit(1)
 					}
+			                defer outputfile.Close()
 				}
 			}
-			inputfile.Close()
-			outputfile.Close()
 		}
 	}
 }
@@ -75,6 +76,7 @@ func main() {
 		log.Fatal(err)
 		os.Exit(1)
 	}
+	defer jsonfile.Close()
 
 	// Read json file into a byte array
 	b, err := ioutil.ReadAll(jsonfile)
@@ -84,5 +86,4 @@ func main() {
 	}
 
 	processData(Unixfiles{}, b)
-	jsonfile.Close()
 }
